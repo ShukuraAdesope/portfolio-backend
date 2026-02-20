@@ -1,12 +1,13 @@
+require("dotenv").config(); // Load environment variables
+
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const morgan = require("morgan");
-const createError = require("http-errors");
 
 const app = express();
 
-// ✅ IMPORTANT: Use Render's port in production
+// Use Render port or default to 3000
 const PORT = process.env.PORT || 3000;
 
 // =====================
@@ -33,11 +34,13 @@ app.use("/api/users", userRoutes);
 // MongoDB Connection
 // =====================
 
-// ⚠️ SECURITY FIX (Recommended):
-// Use environment variable instead of hardcoding your password
-const MONGO_URI = process.env.MONGO_URI;
- "mongodb+srv://ShukuraAdesope:Raliat28@cluster0.luowsh6.mongodb.net/portfolio?retryWrites=true&w=majority";
-mongoose.connect(MONGO_URI)
+// Use environment variable if available, otherwise use local fallback
+const MONGO_URI =
+  process.env.MONGO_URI ||
+  "mongodb+srv://ShukuraAdesope:Raliat28@cluster0.luowsh6.mongodb.net/portfolio?retryWrites=true&w=majority";
+
+mongoose
+  .connect(MONGO_URI)
   .then(() => {
     console.log("✅ Connected to MongoDB Atlas");
   })
@@ -46,7 +49,7 @@ mongoose.connect(MONGO_URI)
   });
 
 // =====================
-// Test Route
+// Root Route
 // =====================
 app.get("/", (req, res) => {
   res.send("API is running...");
@@ -58,7 +61,7 @@ app.get("/", (req, res) => {
 app.use((err, req, res, next) => {
   res.status(err.status || 500).json({
     success: false,
-    message: err.message || "Internal Server Error"
+    message: err.message || "Internal Server Error",
   });
 });
 
