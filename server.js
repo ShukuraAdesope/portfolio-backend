@@ -36,7 +36,7 @@ app.use("/api/users", userRoutes);
 // ⚠️ SECURITY FIX (Recommended):
 // Use environment variable instead of hardcoding your password
 const MONGO_URI = process.env.MONGO_URI;
-
+ "mongodb+srv://ShukuraAdesope:Raliat28@cluster0.luowsh6.mongodb.net/portfolio?retryWrites=true&w=majority";
 mongoose.connect(MONGO_URI)
   .then(() => {
     console.log("✅ Connected to MongoDB Atlas");
