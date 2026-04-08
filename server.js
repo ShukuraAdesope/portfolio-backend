@@ -1,4 +1,4 @@
-require("dotenv").config(); // Load environment variables
+require("dotenv").config(); // load environment variables
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -7,67 +7,109 @@ const morgan = require("morgan");
 
 const app = express();
 
-// Use Render port or default to 3000
+
+// =====================
+// PORT
+// =====================
 const PORT = process.env.PORT || 3000;
 
+
 // =====================
-// Middleware
+// MIDDLEWARE
 // =====================
 app.use(cors());
+
 app.use(morgan("dev"));
+
 app.use(express.json());
 
+
 // =====================
-// Routes
+// ROUTES IMPORT
 // =====================
 const referenceRoutes = require("./routes/reference.routes");
+
 const projectRoutes = require("./routes/project.routes");
+
 const serviceRoutes = require("./routes/service.routes");
+
 const userRoutes = require("./routes/users.routes");
 
+const authRoutes = require("./routes/auth.routes"); // authentication routes
+
+
+// =====================
+// ROUTES USE
+// =====================
+
 app.use("/api/references", referenceRoutes);
+
 app.use("/api/projects", projectRoutes);
+
 app.use("/api/services", serviceRoutes);
+
 app.use("/api/users", userRoutes);
 
+app.use("/api/auth", authRoutes); // signup & signin routes
+
+
 // =====================
-// MongoDB Connection
+// DATABASE CONNECTION
 // =====================
 
-// Use environment variable if available, otherwise use local fallback
-const MONGO_URI =
-  process.env.MONGO_URI ||
-  "mongodb+srv://ShukuraAdesope:Raliat28@cluster0.luowsh6.mongodb.net/portfolio?retryWrites=true&w=majority";
+const MONGO_URI = process.env.MONGO_URI;
+
 
 mongoose
-  .connect(MONGO_URI)
-  .then(() => {
-    console.log("✅ Connected to MongoDB Atlas");
-  })
-  .catch((err) => {
-    console.error("❌ MongoDB connection error:", err);
-  });
+.connect(MONGO_URI)
+.then(() => {
 
-// =====================
-// Root Route
-// =====================
-app.get("/", (req, res) => {
-  res.send("API is running...");
+ console.log("✅ MongoDB connected");
+
+})
+.catch((error) => {
+
+ console.log("❌ MongoDB connection error");
+
+ console.log(error);
+
 });
 
-// =====================
-// Global Error Handler
-// =====================
-app.use((err, req, res, next) => {
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-  });
-});
 
 // =====================
-// Start Server
+// ROOT ROUTE
 // =====================
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+
+app.get("/", (req,res)=>{
+
+ res.send("Portfolio API running");
+
+});
+
+
+// =====================
+// ERROR HANDLER
+// =====================
+
+app.use((err,req,res,next)=>{
+
+ res.status(err.status || 500).json({
+
+  success:false,
+
+  message:err.message || "Server Error"
+
+ });
+
+});
+
+
+// =====================
+// START SERVER
+// =====================
+
+app.listen(PORT,()=>{
+
+ console.log(`🚀 Server running on port ${PORT}`);
+
 });
