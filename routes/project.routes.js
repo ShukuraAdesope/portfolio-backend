@@ -1,24 +1,36 @@
-const express = require('express');
+const express = require("express");
 
 const router = express.Router();
 
-const projectController = require('../controllers/project.controller');
+const projectController = require("../controllers/project.controller");
 
-const auth = require('../middleware/auth');
-
-
-// public routes
-router.get('/', projectController.getAllProjects);
-
-router.get('/:id', projectController.getProjectById);
+const auth = require("../middleware/auth");
 
 
-// protected routes
-router.post('/', auth, projectController.addProject);
+// ======================
+// PUBLIC ROUTES
+// ======================
 
-router.put('/:id', auth, projectController.updateProject);
+// get all projects
+router.get("/", projectController.getAllProjects);
 
-router.delete('/:id', auth, projectController.deleteProject);
+// get single project
+router.get("/:id", projectController.getProjectById);
+
+
+// ======================
+// PROTECTED ROUTES
+// require login token
+// ======================
+
+// create project
+router.post("/", auth, projectController.addProject);
+
+// update project
+router.put("/:id", auth, projectController.updateProject);
+
+// delete project
+router.delete("/:id", auth, projectController.deleteProject);
 
 
 module.exports = router;

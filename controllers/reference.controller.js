@@ -1,101 +1,285 @@
 const Reference = require("../models/reference");
+
 const createError = require("http-errors");
 
-// CREATE
+
+// ======================
+// CREATE REFERENCE
+// ======================
+
 exports.addReference = async (req, res, next) => {
-  try {
-    const reference = new Reference(req.body);
-    const saved = await reference.save();
 
-    res.status(201).json({
-      success: true,
-      message: "Reference added successfully.",
-      data: {
-        firstname: saved.firstname,
-        lastname: saved.lastname,
-        email: saved.email,
-        position: saved.position,
-        company: saved.company,
-        id: saved._id
-      }
-    });
-  } catch (err) {
-    next(err);
-  }
+ try {
+
+  const reference = new Reference({
+
+   firstname: req.body.firstname,
+
+   lastname: req.body.lastname,
+
+   email: req.body.email,
+
+   position: req.body.position,
+
+   company: req.body.company
+
+  });
+
+
+  const saved = await reference.save();
+
+
+  res.status(201).json({
+
+   success: true,
+
+   message: "Reference added successfully.",
+
+   data: {
+
+    id: saved._id,
+
+    firstname: saved.firstname,
+
+    lastname: saved.lastname,
+
+    email: saved.email,
+
+    position: saved.position,
+
+    company: saved.company
+
+   }
+
+  });
+
+ }
+ catch (err) {
+
+  next(err);
+
+ }
+
 };
 
-// GET ALL
+
+
+// ======================
+// GET ALL REFERENCES
+// ======================
+
 exports.getAllReferences = async (req, res, next) => {
-  try {
-    const references = await Reference.find();
 
-    const formatted = references.map(ref => ({
-      firstname: ref.firstname,
-      lastname: ref.lastname,
-      email: ref.email,
-      position: ref.position,
-      company: ref.company,
-      id: ref._id
-    }));
+ try {
 
-    res.json({
-      success: true,
-      message: "References list retrieved successfully.",
-      data: formatted
-    });
-  } catch (err) {
-    next(err);
-  }
+  const references = await Reference.find().sort({ created: -1 });
+
+
+  const formatted = references.map(ref => ({
+
+   id: ref._id,
+
+   firstname: ref.firstname,
+
+   lastname: ref.lastname,
+
+   email: ref.email,
+
+   position: ref.position,
+
+   company: ref.company
+
+  }));
+
+
+  res.json({
+
+   success: true,
+
+   message: "References retrieved successfully.",
+
+   data: formatted
+
+  });
+
+ }
+ catch (err) {
+
+  next(err);
+
+ }
+
 };
 
-// GET BY ID
+
+
+// ======================
+// GET REFERENCE BY ID
+// ======================
+
 exports.getReferenceById = async (req, res, next) => {
-  try {
-    const ref = await Reference.findById(req.params.id);
 
-    if (!ref) return next(createError(404, "Reference not found"));
+ try {
 
-    res.json({
-      success: true,
-      message: "Reference retrieved successfully.",
-      data: {
-        firstname: ref.firstname,
-        lastname: ref.lastname,
-        email: ref.email,
-        position: ref.position,
-        company: ref.company,
-        id: ref._id
-      }
-    });
-  } catch (err) {
-    next(err);
+  const reference = await Reference.findById(req.params.id);
+
+
+  if (!reference) {
+
+   return next(
+
+    createError(404, "Reference not found")
+
+   );
+
   }
+
+
+  res.json({
+
+   success: true,
+
+   message: "Reference retrieved successfully.",
+
+   data: {
+
+    id: reference._id,
+
+    firstname: reference.firstname,
+
+    lastname: reference.lastname,
+
+    email: reference.email,
+
+    position: reference.position,
+
+    company: reference.company
+
+   }
+
+  });
+
+ }
+ catch (err) {
+
+  next(err);
+
+ }
+
 };
 
-// UPDATE
+
+
+// ======================
+// UPDATE REFERENCE
+// ======================
+
 exports.updateReference = async (req, res, next) => {
-  try {
-    await Reference.findByIdAndUpdate(req.params.id, req.body);
 
-    res.json({
-      success: true,
-      message: "Reference updated successfully."
-    });
-  } catch (err) {
-    next(err);
+ try {
+
+  const updated = await Reference.findByIdAndUpdate(
+
+   req.params.id,
+
+   req.body,
+
+   {
+
+    new: true,
+
+    runValidators: true
+
+   }
+
+  );
+
+
+  if (!updated) {
+
+   return next(
+
+    createError(404, "Reference not found")
+
+   );
+
   }
+
+
+  res.json({
+
+   success: true,
+
+   message: "Reference updated successfully.",
+
+   data: {
+
+    id: updated._id,
+
+    firstname: updated.firstname,
+
+    lastname: updated.lastname,
+
+    email: updated.email,
+
+    position: updated.position,
+
+    company: updated.company
+
+   }
+
+  });
+
+ }
+ catch (err) {
+
+  next(err);
+
+ }
+
 };
 
-// DELETE
-exports.deleteReference = async (req, res, next) => {
-  try {
-    await Reference.findByIdAndDelete(req.params.id);
 
-    res.json({
-      success: true,
-      message: "Reference deleted successfully."
-    });
-  } catch (err) {
-    next(err);
+
+// ======================
+// DELETE REFERENCE
+// ======================
+
+exports.deleteReference = async (req, res, next) => {
+
+ try {
+
+  const deleted = await Reference.findByIdAndDelete(
+
+   req.params.id
+
+  );
+
+
+  if (!deleted) {
+
+   return next(
+
+    createError(404, "Reference not found")
+
+   );
+
   }
+
+
+  res.json({
+
+   success: true,
+
+   message: "Reference deleted successfully."
+
+  });
+
+ }
+ catch (err) {
+
+  next(err);
+
+ }
+
 };
